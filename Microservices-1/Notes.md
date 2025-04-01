@@ -1,0 +1,2 @@
+### Good Practices
+1. Don't return the Entity class directly from the controller instead create a Model response class which can be returned from the controller instead of returning the fetched data directly from the DB.
