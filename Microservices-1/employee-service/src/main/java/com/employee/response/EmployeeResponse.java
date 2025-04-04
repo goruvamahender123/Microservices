@@ -9,4 +9,5 @@ public class EmployeeResponse {
 	private String bloodGroup;
 	private String name;
 	private String email;
+	private AddressResponse addressResponse;
 }
