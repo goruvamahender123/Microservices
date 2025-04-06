@@ -7,6 +7,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.employee.model.Employee;
 import com.employee.repository.EmployeeRepo;
@@ -21,21 +22,27 @@ public class EmployeeService {
 
 	private RestTemplate restTemplate;
 
+	@Autowired
+	private WebClient webClient;
+
 //	@Value("${address.base.url}")
 //	private String addressBaseUrl;
 
-	public EmployeeService(@Value("${address.base.url}") String addressBaseUrl, RestTemplateBuilder builder) {
-		System.out.println(addressBaseUrl);
-		this.restTemplate = builder.rootUri(addressBaseUrl).build();
-	}
+//	public EmployeeService(@Value("${address.base.url}") String addressBaseUrl, RestTemplateBuilder builder) {
+//		System.out.println(addressBaseUrl);
+//		this.restTemplate = builder.rootUri(addressBaseUrl).build();
+//	}
 
 	public EmployeeResponse getByEmployeeId(int id) {
 		Employee employee = employeeRepo.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
 
 		EmployeeResponse resp = new EmployeeResponse();
 
-		ResponseEntity<AddressResponse> address = restTemplate.getForEntity("/address/{id}", AddressResponse.class, id);
-		resp.setAddressResponse(address.getBody());
+//		AddressResponse address = restTemplate.getForObject("/address/{id}", AddressResponse.class, id);
+
+		AddressResponse address = webClient.get().uri("/address/" + id).retrieve().bodyToMono(AddressResponse.class)
+				.block();
+		resp.setAddressResponse(address);
 
 		BeanUtils.copyProperties(employee, resp);
 
